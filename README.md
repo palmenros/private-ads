@@ -38,6 +38,12 @@ Deploy smart contracts to that local network:
 npx hardhat deploy --network sapphire-localnet
 ```
 
+Export the private key so it will be used to deploy the smart contract:
+
+```sh
+export PRIVATE_KEY=0x...
+```
+
 To execute a task from the command line to call the smart contract, define it using a `task` inside `backend/hardhat.config.ts` and pass the contract address when deployed. For example, for `task('message')`:
 ```sh
 npx hardhat message --network sapphire-localnet 0xCONTRACT_ADDRESS
