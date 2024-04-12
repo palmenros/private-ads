@@ -81,6 +81,7 @@ export const useEthereumStore = defineStore('ethereum', () => {
   const unwrappedSigner = shallowRef<Signer>();
 
   const network = ref(Network.FromConfig);
+  console.log('Network:', networkName(network.value))
   const address = ref<string | undefined>(undefined);
   const status = ref(ConnectionStatus.Unknown);
 
@@ -122,6 +123,8 @@ export const useEthereumStore = defineStore('ethereum', () => {
 
   const connect = async () => {
     const eth = await getEthereumProvider();
+
+    eth.enable()
 
     const accounts: string[] = (await (eth.request?.({
       method: 'eth_accounts',

@@ -25,10 +25,11 @@ Next, deploy the contract.
 
 ### Basic Local Hardhat Deployment
 
-Start the hardhat node:
+Start the hardhat node. You can either use the local version or the docker sapphire-localnet.
 
 ```sh
-npx hardhat node
+#npx hardhat node (LOCAL)
+docker run -it -p8545:8545 -p8546:8546 ghcr.io/oasisprotocol/sapphire-localnet
 ```
 
 Deploy smart contracts to that local network:
@@ -39,15 +40,15 @@ npx hardhat deploy --network sapphire-localnet
 
 To execute a task from the command line to call the smart contract, define it using a `task` inside `backend/hardhat.config.ts` and pass the contract address when deployed. For example, for `task('message')`:
 ```sh
-npx hardhat message --network sapphire-localnet 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+npx hardhat message --network sapphire-localnet 0xCONTRACT_ADDRESS
 ```
 
 The deployed MessageBox address will be reported. Remember it and store it
 inside the `frontend` folder's `.env.development`, for example:
 
 ```
-VITE_MESSAGE_BOX_ADDR=0x5FbDB2315678afecb367f032d93F642f64180aa3
-VITE_NETWORK=0x539
+VITE_MESSAGE_BOX_ADDR=0xCONTRACT_ADDRESS
+VITE_NETWORK=0x5afd
 VITE_WEB3_GATEWAY=http://localhost:8545
 ```
 
