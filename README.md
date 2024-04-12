@@ -34,7 +34,12 @@ npx hardhat node
 Deploy smart contracts to that local network:
 
 ```sh
-npx hardhat deploy --network localhost
+npx hardhat deploy --network sapphire-localnet
+```
+
+To execute a task from the command line to call the smart contract, define it using a `task` inside `backend/hardhat.config.ts` and pass the contract address when deployed. For example, for `task('message')`:
+```sh
+npx hardhat message --network sapphire-localnet 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
 ```
 
 The deployed MessageBox address will be reported. Remember it and store it
@@ -45,7 +50,6 @@ VITE_MESSAGE_BOX_ADDR=0x5FbDB2315678afecb367f032d93F642f64180aa3
 VITE_NETWORK=0x539
 VITE_WEB3_GATEWAY=http://localhost:8545
 ```
-
 
 ### Deploying to Sapphire Localnet, Testnet and Mainnet
 
