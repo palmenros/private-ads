@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 
-import HomeView from './views/HomeView.vue';
+import ClientView from './views/ClientView.vue';
+import BusinessView from './views/BusinessView.vue'
 
 const router = createRouter({
   strict: true,
@@ -8,7 +9,11 @@ const router = createRouter({
   routes: [
     {
       path: `/`,
-      component: HomeView,
+      component: ClientView,
+    },
+    {
+      path: `/Company`,
+      component: BusinessView,
     },
     {
       path: '/:path(.*)',
