@@ -105,7 +105,7 @@ const config: HardhatUserConfig = {
     },
     'sapphire-localnet': { // docker run -it -p8545:8545 -p8546:8546 ghcr.io/oasisprotocol/sapphire-localnet -test-mnemonic
       url: 'http://localhost:8545',
-      chainId: 0x5afd,
+      chainId: 1337,
       accounts,
     },
   },
