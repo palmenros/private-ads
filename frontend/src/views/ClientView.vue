@@ -21,70 +21,15 @@ const isLoading = ref(true);
 const isSettingMessage = ref(false);
 const isCorrectNetworkSelected = ref<Boolean>(true);
 
-interface Message {
-  message: string;
-  author: string;
+interface User {
+  name: string;
+  country: string;
+  puntuation: number;
 }
 
 function handleError(error: Error, errorMessage: string) {
   errors.value.push(`${errorMessage}: ${error.message ?? JSON.stringify(error)}`);
   console.error(error);
-}
-
-async function fetchMessage(): Promise<Message> {
-  const message = await messageBox.value!.message();
-  const author = await messageBox.value!.author();
-
-  return { message, author };
-}
-
-async function fetchAndSetMessageValues(): Promise<Message | null> {
-  let retrievedMessage: Message | null = null;
-
-  try {
-    retrievedMessage = await fetchMessage();
-    message.value = retrievedMessage.message;
-    author.value = retrievedMessage.author;
-
-    return retrievedMessage;
-  } catch (e) {
-    handleError(e as Error, 'Failed to get message');
-  } finally {
-    isLoading.value = false;
-  }
-
-  return retrievedMessage;
-}
-
-async function setMessage(e: Event): Promise<void> {
-  if (e.target instanceof HTMLFormElement) {
-    e.target.checkValidity();
-    if (!e.target.reportValidity()) return;
-  }
-
-  e.preventDefault();
-
-  try {
-    const newMessageValue = newMessage.value;
-    errors.value.splice(0, errors.value.length);
-    isSettingMessage.value = true;
-
-    await messageBox.value!.setMessage(newMessageValue);
-
-    await retry<Promise<Message | null>>(fetchAndSetMessageValues, (retrievedMessage) => {
-      if (retrievedMessage?.message !== newMessageValue) {
-        throw new Error('Unable to determine if the new message has been correctly set!');
-      }
-
-      return retrievedMessage;
-    });
-
-    newMessage.value = '';
-  } catch (e: any) {
-    handleError(e, 'Failed to set message');
-  } finally {
-    isSettingMessage.value = false;
-  }
 }
 
 async function switchNetwork() {
@@ -102,15 +47,42 @@ async function connectAndSwitchNetwork() {
 
 onMounted(async () => {
   await connectAndSwitchNetwork();
-  await fetchAndSetMessageValues();
 });
+
+const user = ref<User>({
+  name: '',
+  country: '',
+  puntuation: 0
+});
+const isSettingUser = ref(false);
+
+function setUser() {
+  // Validation
+  if (!user.value.name || !user.value.country || user.value.puntuation < 0) {
+    // Handle validation error
+    return;
+  }
+
+  isSettingUser.value = true;
+
+  // Simulate asynchronous request
+  setTimeout(() => {
+    console.log('User details updated:', user.value);
+    isSettingUser.value = false;
+  }, 1000);
+}
+
+function toggleUserInfo() {
+      var userInfo = document.getElementById("userInfo");
+      userInfo.style.display = userInfo.style.display === "none" ? "block" : "none";
+    }
+
 </script>
 
 <template>
   <section class="pt-5" v-if="isCorrectNetworkSelected">
-    <h1 class="capitalize text-2xl text-white font-bold mb-4">Demo starter</h1>
 
-    <h2 class="capitalize text-xl text-white font-bold mb-4">Active message</h2>
+    <h2 class="capitalize text-xl text-white font-bold mb-4">Ad displayed</h2>
 
     <div class="message p-6 mb-6 rounded-xl border-2 border-gray-300" v-if="!isLoading">
       <div class="flex items-center justify-between">
@@ -127,36 +99,73 @@ onMounted(async () => {
       </div>
     </div>
 
-    <h2 class="capitalize text-xl text-white font-bold mb-4">Set message</h2>
+    <h2 class="capitalize text-xl text-white font-bold mb-4">Set your personal information</h2>
     <p class="text-base text-white mb-10">
-      Set your new message by filling the message field bellow.
+      Set your information to receive custom ads.
     </p>
 
-    <form @submit="setMessage">
-      <div class="form-group">
-        <input
-          type="text"
-          id="newMessageText"
-          class="peer"
-          placeholder=" "
-          v-model="newMessage"
-          required
-          :disabled="isSettingMessage"
-        />
+    <form @submit="setUser">
+    <div class="form-group">
+      <input
+        type="text"
+        id="newName"
+        class="peer"
+        placeholder=" "
+        v-model="user.name"
+        required
+        :disabled="isSettingCompanyAd"
+      />
+      <label
+        for="newName"
+        class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
+      >
+        New name:
+        <span class="text-red-500">*</span>
+      </label>
+    </div>
 
-        <label
-          for="newMessageText"
-          class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
-        >
-          New message:
-          <span class="text-red-500">*</span>
-        </label>
-      </div>
+    <div class="form-group">
+      <input
+        type="text"
+        id="newCountry"
+        class="peer"
+        placeholder=" "
+        v-model="user.country"
+        required
+        :disabled="isSettingCompanyAd"
+      />
+      <label
+        for="newCountry"
+        class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
+      >
+        New country:
+        <span class="text-red-500">*</span>
+      </label>
+    </div>
 
-      <AppButton type="submit" variant="primary" :disabled="isSettingMessage">
-        <span v-if="isSettingMessage">Setting…</span>
-        <span v-else>Set Message</span>
-      </AppButton>
+    <div class="form-group">
+      <input
+        type="number"
+        id="newPuntuation"
+        class="peer"
+        placeholder=" "
+        v-model="user.puntuation"
+        required
+        :disabled="isSettingCompanyAd"
+      />
+      <label
+        for="newPuntuation"
+        class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
+      >
+        New puntuation:
+        <span class="text-red-500">*</span>
+      </label>
+    </div>
+
+    <AppButton type="submit" variant="primary" :disabled="isSettingCompanyAd">
+      <span v-if="isSettingCompanyAd">Setting…</span>
+      <span v-else>Set User</span>
+    </AppButton>
 
       <div v-if="errors.length > 0" class="text-red-500 px-3 mt-5 rounded-xl-sm">
         <span class="font-bold">Errors:</span>
@@ -165,6 +174,7 @@ onMounted(async () => {
         </ul>
       </div>
     </form>
+
   </section>
   <section class="pt-5" v-else>
     <h2 class="capitalize text-white text-2xl font-bold mb-4">Invalid network detected</h2>
