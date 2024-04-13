@@ -24,7 +24,11 @@ const isCorrectNetworkSelected = ref<Boolean>(true);
 interface User {
   name: string;
   country: string;
-  puntuation: number;
+  salary: number;
+  age: number;
+  interest: string;
+  latitude: number;
+  longitude: number;
 }
 
 function handleError(error: Error, errorMessage: string) {
@@ -52,13 +56,17 @@ onMounted(async () => {
 const user = ref<User>({
   name: '',
   country: '',
-  puntuation: 0
+  salary: 0,
+  age: 0,
+  interest: '',
+  latitude: 0,
+  longitude: 0
 });
 const isSettingUser = ref(false);
 
 function setUser() {
   // Validation
-  if (!user.value.name || !user.value.country || user.value.puntuation < 0) {
+  if (!user.value.name || !user.value.country || user.value.salary < 0 || user.value.age < 0 || !user.value.interest || user.value.latitude < 0 || user.value.longitude < 0) {
     // Handle validation error
     return;
   }
@@ -146,18 +154,94 @@ function toggleUserInfo() {
     <div class="form-group">
       <input
         type="number"
-        id="newPuntuation"
+        id="newSalary"
         class="peer"
         placeholder=" "
-        v-model="user.puntuation"
+        v-model="user.salary"
         required
         :disabled="isSettingCompanyAd"
       />
       <label
-        for="newPuntuation"
+        for="newSalary"
         class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
       >
-        New puntuation:
+        New salary:
+        <span class="text-red-500">*</span>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <input
+        type="number"
+        id="newAge"
+        class="peer"
+        placeholder=" "
+        v-model="user.age"
+        required
+        :disabled="isSettingCompanyAd"
+      />
+      <label
+        for="newAge"
+        class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
+      >
+        New age:
+        <span class="text-red-500">*</span>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <input
+        type="text"
+        id="newInterest"
+        class="peer"
+        placeholder=" "
+        v-model="user.interest"
+        required
+        :disabled="isSettingCompanyAd"
+      />
+      <label
+        for="newInterest"
+        class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
+      >
+        New interest:
+        <span class="text-red-500">*</span>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <input
+        type="number"
+        id="newLatitude"
+        class="peer"
+        placeholder=" "
+        v-model="user.latitude"
+        required
+        :disabled="isSettingCompanyAd"
+      />
+      <label
+        for="newLatitude"
+        class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
+      >
+        New latitude:
+        <span class="text-red-500">*</span>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <input
+        type="number"
+        id="newLongitude"
+        class="peer"
+        placeholder=" "
+        v-model="user.longitude"
+        required
+        :disabled="isSettingCompanyAd"
+      />
+      <label
+        for="newLongitude"
+        class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
+      >
+        New longitude:
         <span class="text-red-500">*</span>
       </label>
     </div>

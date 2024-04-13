@@ -15,10 +15,6 @@ function useCompanyAdBox() {
       // Placeholder implementation for fetching content
       return 'Sample content';
     },
-    async author() {
-      // Placeholder implementation for fetching author
-      return 'Sample author';
-    },
     async setCompanyAd(amount: number, content: string) {
       // Placeholder implementation for setting company ad
       console.log('Setting company ad:', { amount, content });
@@ -31,6 +27,10 @@ const companyAdBox = useCompanyAdBox();
 const errors = ref<string[]>([]);
 const newAmount = ref(0);
 const newContent = ref('');
+const newSalary = ref(0);
+const newAge = ref(0);
+const newLatitude = ref(0);
+const newLongitude = ref(0);
 const isSettingCompanyAd = ref(false);
 const isCorrectNetworkSelected = ref<Boolean>(true);
 
@@ -40,8 +40,6 @@ function handleError(error: Error, errorMessage: string) {
 }
 
 async function fetchAndSetCompanyAdValues() {
-  let retrievedCompanyAd = null;
-
   try {
     const amount = await companyAdBox.amount();
     const content = await companyAdBox.content();
@@ -64,10 +62,15 @@ async function setCompanyAd(e: Event) {
   try {
     const amount = newAmount.value;
     const content = newContent.value;
+    const salary = newSalary.value;
+    const age = newAge.value;
+    const latitude = newLatitude.value;
+    const longitude = newLongitude.value;
+    
     errors.value.splice(0, errors.value.length);
     isSettingCompanyAd.value = true;
 
-    await companyAdBox.setCompanyAd(amount, content);
+    await companyAdBox.setCompanyAd(amount, content, salary, age, latitude, longitude);
 
     await retry(fetchAndSetCompanyAdValues);
   } catch (e: any) {
@@ -119,7 +122,7 @@ onMounted(async () => {
           for="newAmount"
           class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
         >
-          New amount:
+          New amount of ads:
           <span class="text-red-500">*</span>
         </label>
       </div>
@@ -138,7 +141,83 @@ onMounted(async () => {
           for="newContent"
           class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
         >
-          New content:
+          Description of the Add:
+          <span class="text-red-500">*</span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <input
+          type="number"
+          id="newSalary"
+          class="peer"
+          placeholder=" "
+          v-model="newSalary"
+          required
+          :disabled="isSettingCompanyAd"
+        />
+        <label
+          for="newSalary"
+          class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
+        >
+          Salary expected per user:
+          <span class="text-red-500">*</span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <input
+          type="number"
+          id="newAge"
+          class="peer"
+          placeholder=" "
+          v-model="newAge"
+          required
+          :disabled="isSettingCompanyAd"
+        />
+        <label
+          for="newAge"
+          class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
+        >
+          Age of the user:
+          <span class="text-red-500">*</span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <input
+          type="number"
+          id="newLatitude"
+          class="peer"
+          placeholder=" "
+          v-model="newLatitude"
+          required
+          :disabled="isSettingCompanyAd"
+        />
+        <label
+          for="newLatitude"
+          class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
+        >
+          Latitude:
+          <span class="text-red-500">*</span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <input
+          type="number"
+          id="newLongitude"
+          class="peer"
+          placeholder=" "
+          v-model="newLongitude"
+          required
+          :disabled="isSettingCompanyAd"
+        />
+        <label
+          for="newLongitude"
+          class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
+        >
+          Longitude:
           <span class="text-red-500">*</span>
         </label>
       </div>
