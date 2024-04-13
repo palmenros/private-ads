@@ -8,16 +8,29 @@ contract AdManager {
 
   uint constant SALARY_WEIGHT = 1;
   uint constant AGE_WEIGHT = 1000;
+  /* TODO: PUT WEIGHTS */
+  uint constant WORD_EMBEDDING_WEIGHT = 1;
+  uint constant LOCATION_WEIGHT = 1;
 
   struct AdData {
     uint age;
     uint salary;
+    int xWordEmbedding;
+    int yWordEmbedding;
+    int xLocation;
+    int yLocation;
+    int zLocation;
     string url;
   }
 
   struct UserData {
     uint age;
     uint salary;
+    int xWordEmbedding;
+    int yWordEmbedding;
+    int xLocation;
+    int yLocation;
+    int zLocation;
     bool isActive;
   }
 
@@ -31,6 +44,7 @@ contract AdManager {
   mapping (uint => Ad) private ads;
   uint[] private activeAds;     // ids of active ads
 
+  /*
   constructor() {
     AdData memory adData = AdData({age: 42, salary: 4200, url: "https://example.com"});
 
@@ -50,6 +64,7 @@ contract AdManager {
       
     }
   }
+  */
 
   /****** VIEW FUNCTIONS ******/
   function _getNextAdId() public view returns (uint) {
@@ -83,7 +98,16 @@ contract AdManager {
   function _inference(AdData memory adData, UserData memory userData) pure public returns (uint) {
     uint deltaAge = _abs(int(adData.age) - int(userData.age)) * AGE_WEIGHT;
     uint deltaSalary = _abs(int(adData.salary) - int(userData.salary)) * SALARY_WEIGHT;
-    return deltaAge + deltaSalary;
+    uint deltaWordEmbedding = (
+      uint((adData.xWordEmbedding - userData.xWordEmbedding) ** 2) + 
+      uint((adData.yWordEmbedding - userData.yWordEmbedding) ** 2)
+      ) * WORD_EMBEDDING_WEIGHT;
+    uint deltaLocation = (
+      uint((adData.xLocation - userData.xLocation) ** 2) + 
+      uint((adData.yLocation - userData.yLocation) ** 2) +
+      uint((adData.zLocation - userData.zLocation) ** 2)
+      ) * LOCATION_WEIGHT;
+    return deltaAge + deltaSalary + deltaWordEmbedding + deltaLocation;
   }
 
   /**
@@ -119,6 +143,9 @@ contract AdManager {
     // Find best ad
     uint min = type(uint).max;
     uint bestAdId = 0;
+
+    require(activeAds.length > 0, "There are no Ads to show.");
+
     for (uint i = 0; i < activeAds.length; i++) {
 
       uint res = _inference(ads[activeAds[i]].data, userData);
