@@ -4,33 +4,16 @@ import { Network, useEthereumStore } from '../stores/ethereum';
 import AppButton from '@/components/AppButton.vue';
 import { retry } from '@/utils/promise';
 
-// Placeholder implementation for useCompanyAdBox
-function useCompanyAdBox() {
-  return {
-    async amount() {
-      // Placeholder implementation for fetching amount
-      return 100;
-    },
-    async content() {
-      // Placeholder implementation for fetching content
-      return 'Sample content';
-    },
-    async setCompanyAd(amount: number, content: string) {
-      // Placeholder implementation for setting company ad
-      console.log('Setting company ad:', { amount, content });
-    }
-  };
-}
-
 const eth = useEthereumStore();
-const companyAdBox = useCompanyAdBox();
 const errors = ref<string[]>([]);
-const newAmount = ref(0);
-const newContent = ref('');
-const newSalary = ref(0);
-const newAge = ref(0);
-const newLatitude = ref(0);
-const newLongitude = ref(0);
+
+const newAmount = ref(null);
+const newContent = ref(null);
+const newSalary = ref(null);
+const newAge = ref(null);
+const newLatitude = ref(null);
+const newLongitude = ref(null);
+
 const isSettingCompanyAd = ref(false);
 const isCorrectNetworkSelected = ref<Boolean>(true);
 
@@ -39,17 +22,7 @@ function handleError(error: Error, errorMessage: string) {
   console.error(error);
 }
 
-async function fetchAndSetCompanyAdValues() {
-  try {
-    const amount = await companyAdBox.amount();
-    const content = await companyAdBox.content();
-
-    newAmount.value = amount;
-    newContent.value = content;
-  } catch (e) {
-    handleError(e as Error, 'Failed to get company ad');
-  }
-}
+const interestPicker = ref(null)
 
 async function setCompanyAd(e: Event) {
   if (e.target instanceof HTMLFormElement) {
@@ -59,20 +32,55 @@ async function setCompanyAd(e: Event) {
 
   e.preventDefault();
 
-  try {
-    const amount = newAmount.value;
-    const content = newContent.value;
-    const salary = newSalary.value;
-    const age = newAge.value;
-    const latitude = newLatitude.value;
-    const longitude = newLongitude.value;
-    
+    try {
+      const amount = newAmount.value;
+      const content = newContent.value;
+      const salary = newSalary.value;
+      const age = newAge.value;
+      const latitude = newLatitude.value;
+      const longitude = newLongitude.value;
+
+      if (amount === undefined ||
+        content === undefined || 
+        salary === undefined ||
+        age === undefined ||
+        latitude === undefined ||
+        longitude === undefined || interestPicker === undefined) {
+          return;
+      }
+
+    // Validation
+    if(salary < 0 || age < 0 || latitude < 0 || longitude < 0) {
+      // Handle validation error
+      return;
+    }
+
     errors.value.splice(0, errors.value.length);
     isSettingCompanyAd.value = true;
 
-    await companyAdBox.setCompanyAd(amount, content, salary, age, latitude, longitude);
+    console.log({amount, content, salary, age, latitude, longitude})
 
-    await retry(fetchAndSetCompanyAdValues);
+    let selectedItem = interestPicker.value.getSelectedItem()
+    if (selectedItem === '') {
+      return;
+    }
+
+    let embeddingsStr = null;
+
+    if(Array.isArray(selectedItem)) {
+      embeddingsStr = selectedItem;
+    } else {
+      embeddingsStr = selectedItem.value;
+    }
+
+    let embeddings = embeddingsStr.map(x => parseFloat(x))
+
+    console.log(embeddings)
+
+
+    // await companyAdBox.setCompanyAd(amount, content, salary, age, latitude, longitude);
+
+    // await retry(fetchAndSetCompanyAdValues);
   } catch (e: any) {
     handleError(e, 'Failed to set company ad');
   } finally {
@@ -95,16 +103,18 @@ async function connectAndSwitchNetwork() {
 
 onMounted(async () => {
   await connectAndSwitchNetwork();
-  await fetchAndSetCompanyAdValues();
 });
 </script>
 
 
 <template>
   <section class="pt-5" v-if="isCorrectNetworkSelected">
-    <h2 class="capitalize text-xl text-white font-bold mb-4">Set company ad</h2>
+    
+    <h1 class="text-center text-4xl	text-white font-bold mb-4">ADVERTISER COMPANY  <i class="fa fa-solid fa-building"></i></h1>
+    
+    <h2 class="capitalize text-xl text-white font-bold mb-4">Publish new company ad</h2>
     <p class="text-base text-white mb-10">
-      Set your new company ad by filling the form below.
+      Publish your new company ad by filling the form below.
     </p>
 
     <form @submit="setCompanyAd">
@@ -122,7 +132,7 @@ onMounted(async () => {
           for="newAmount"
           class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
         >
-          New amount of ads:
+          Number of ad copies to publish:
           <span class="text-red-500">*</span>
         </label>
       </div>
@@ -132,7 +142,7 @@ onMounted(async () => {
           type="text"
           id="newContent"
           class="peer"
-          placeholder=" "
+          placeholder=""
           v-model="newContent"
           required
           :disabled="isSettingCompanyAd"
@@ -141,10 +151,12 @@ onMounted(async () => {
           for="newContent"
           class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
         >
-          Description of the Add:
+          Ad content:
           <span class="text-red-500">*</span>
         </label>
       </div>
+
+      <p class="text-base text-white mb-10">Target viewer information.</p>
 
       <div class="form-group">
         <input
@@ -160,7 +172,7 @@ onMounted(async () => {
           for="newSalary"
           class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
         >
-          Salary expected per user:
+          Target salary:
           <span class="text-red-500">*</span>
         </label>
       </div>
@@ -179,14 +191,14 @@ onMounted(async () => {
           for="newAge"
           class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
         >
-          Age of the user:
+          Target age:
           <span class="text-red-500">*</span>
         </label>
       </div>
 
       <div class="form-group">
         <input
-          type="number"
+          type="number" step="any"
           id="newLatitude"
           class="peer"
           placeholder=" "
@@ -198,14 +210,14 @@ onMounted(async () => {
           for="newLatitude"
           class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
         >
-          Latitude:
+          Target latitude:
           <span class="text-red-500">*</span>
         </label>
       </div>
 
       <div class="form-group">
         <input
-          type="number"
+          type="number" step="any"
           id="newLongitude"
           class="peer"
           placeholder=" "
@@ -217,7 +229,7 @@ onMounted(async () => {
           for="newLongitude"
           class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
         >
-          Longitude:
+          Target longitude:
           <span class="text-red-500">*</span>
         </label>
       </div>

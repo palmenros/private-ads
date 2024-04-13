@@ -105,6 +105,9 @@ importers:
       vue-router:
         specifier: ^4.1.6
         version: 4.1.6(vue@3.2.45)
+      vue-search-select:
+        specifier: ^3.2.0
+        version: 3.2.0
     devDependencies:
       '@rushstack/eslint-patch':
         specifier: ^1.2.0
@@ -6777,6 +6780,10 @@ packages:
     dependencies:
       '@vue/devtools-api': 6.5.0
       vue: 3.2.45
+    dev: false
+
+  /vue-search-select@3.2.0:
+    resolution: {integrity: sha512-X4FCEocMX3vJ/hJRgAcOG18GFxHHNj2umkZee0Pa4kMemBapma6RyOq7GD25kN/FWAal43IbW6GqiZ9h9y0lyA==}
     dev: false
 
   /vue-template-compiler@2.7.14:

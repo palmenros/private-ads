@@ -7,7 +7,9 @@ import { abbrAddr } from '@/utils/utils';
 import AppButton from '@/components/AppButton.vue';
 import MessageLoader from '@/components/MessageLoader.vue';
 import JazzIcon from '@/components/JazzIcon.vue';
+import InterestPicker from '@/components/InterestPicker.vue'
 import { retry } from '@/utils/promise';
+import "vue-search-select/dist/VueSearchSelect.css"
 
 const eth = useEthereumStore();
 const messageBox = useMessageBox();
@@ -22,13 +24,11 @@ const isSettingMessage = ref(false);
 const isCorrectNetworkSelected = ref<Boolean>(true);
 
 interface User {
-  name: string;
-  country: string;
-  salary: number;
-  age: number;
-  interest: string;
-  latitude: number;
-  longitude: number;
+  salary: number|undefined;
+  age: number|undefined;
+  // interest: string;
+  latitude: number|undefined;
+  longitude: number|undefined;
 }
 
 function handleError(error: Error, errorMessage: string) {
@@ -54,43 +54,89 @@ onMounted(async () => {
 });
 
 const user = ref<User>({
-  name: '',
-  country: '',
-  salary: 0,
-  age: 0,
-  interest: '',
-  latitude: 0,
-  longitude: 0
+  salary: undefined,
+  age: undefined,
+  // interest: undefined,
+  latitude: undefined,
+  longitude: undefined
 });
-const isSettingUser = ref(false);
 
-function setUser() {
+const interestPicker = ref(null)
+
+function setUser(e) {  
+  e.preventDefault()
+  if (user.value.salary === undefined ||
+      user.value.age === undefined ||
+      user.value.latitude === undefined ||
+      user.value.longitude === undefined || interestPicker === undefined) {
+        return;
+  }
+
   // Validation
-  if (!user.value.name || !user.value.country || user.value.salary < 0 || user.value.age < 0 || !user.value.interest || user.value.latitude < 0 || user.value.longitude < 0) {
+  if (user.value.salary < 0 || user.value.age < 0 || user.value.latitude < 0 || user.value.longitude < 0) {
     // Handle validation error
     return;
   }
 
-  isSettingUser.value = true;
+  let selectedItem = interestPicker.value.getSelectedItem()
+  if (selectedItem === '') {
+    return;
+  }
+
+  let embeddingsStr = null;
+
+  if(Array.isArray(selectedItem)) {
+    embeddingsStr = selectedItem;
+  } else {
+    embeddingsStr = selectedItem.value;
+  }
+
+  let embeddings = embeddingsStr.map(x => parseFloat(x))
+
+  console.log(embeddings)
+
+  // isSettingUser.value = true;
 
   // Simulate asynchronous request
   setTimeout(() => {
     console.log('User details updated:', user.value);
-    isSettingUser.value = false;
+    // isSettingUser.value = false;
   }, 1000);
 }
 
-function toggleUserInfo() {
-      var userInfo = document.getElementById("userInfo");
-      userInfo.style.display = userInfo.style.display === "none" ? "block" : "none";
-    }
+const getCurrentCoordinates = async () => {
+        const pos = await new Promise((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: false,
+            timeout: 5000,
+            maximumAge: Infinity
+          });
+        });
+    
+        return {
+          long: pos.coords.longitude,
+          lat: pos.coords.latitude,
+        };
+    };
+
+async function setCurrentLocationCoordinates() {
+  let coords = await getCurrentCoordinates()
+  user.value.latitude = coords.lat
+  user.value.longitude = coords.long
+}
+
+// function toggleUserInfo() {
+//       var userInfo = document.getElementById("userInfo");
+//       userInfo.style.display = userInfo.style.display === "none" ? "block" : "none";
+//     }x`
 
 </script>
 
 <template>
+  
   <section class="pt-5" v-if="isCorrectNetworkSelected">
-
-    <h2 class="capitalize text-xl text-white font-bold mb-4">Ad displayed</h2>
+    <h1 class="text-center text-4xl	text-white font-bold mb-4">USER <i class="fa fa-solid fa-user"></i></h1>
+    <h2 class="capitalize text-xl text-white font-bold mb-4">Displayed ad</h2>
 
     <div class="message p-6 mb-6 rounded-xl border-2 border-gray-300" v-if="!isLoading">
       <div class="flex items-center justify-between">
@@ -109,11 +155,15 @@ function toggleUserInfo() {
 
     <h2 class="capitalize text-xl text-white font-bold mb-4">Set your personal information</h2>
     <p class="text-base text-white mb-10">
-      Set your information to receive custom ads.
+      Set your information to receive personalized ads.
     </p>
 
+    <span class="text-base text-white mb-10">Main interest: <span class="text-red-500" data-v-b83013f4="">*</span></span>
+
+    <InterestPicker ref="interestPicker"></InterestPicker>
+
     <form @submit="setUser">
-    <div class="form-group">
+    <!-- <div class="form-group">
       <input
         type="text"
         id="newName"
@@ -130,9 +180,9 @@ function toggleUserInfo() {
         New name:
         <span class="text-red-500">*</span>
       </label>
-    </div>
+    </div> -->
 
-    <div class="form-group">
+    <!-- <div class="form-group">
       <input
         type="text"
         id="newCountry"
@@ -149,47 +199,45 @@ function toggleUserInfo() {
         New country:
         <span class="text-red-500">*</span>
       </label>
-    </div>
+    </div> -->
 
     <div class="form-group">
       <input
-        type="number"
+        type="number" step="any"
         id="newSalary"
         class="peer"
         placeholder=" "
         v-model="user.salary"
         required
-        :disabled="isSettingCompanyAd"
       />
       <label
         for="newSalary"
         class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
       >
-        New salary:
+        Annual salary ($):
         <span class="text-red-500">*</span>
       </label>
     </div>
 
     <div class="form-group">
       <input
-        type="number"
+        type="number" step="any"
         id="newAge"
         class="peer"
         placeholder=" "
         v-model="user.age"
         required
-        :disabled="isSettingCompanyAd"
       />
       <label
         for="newAge"
         class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
       >
-        New age:
+        Age:
         <span class="text-red-500">*</span>
       </label>
     </div>
 
-    <div class="form-group">
+    <!-- <div class="form-group">
       <input
         type="text"
         id="newInterest"
@@ -206,49 +254,50 @@ function toggleUserInfo() {
         New interest:
         <span class="text-red-500">*</span>
       </label>
-    </div>
+    </div> -->
+
+    <AppButton @click="setCurrentLocationCoordinates" variant="secondary">
+      Set current location
+    </AppButton>
 
     <div class="form-group">
       <input
-        type="number"
+        type="number" step="any"
         id="newLatitude"
         class="peer"
         placeholder=" "
         v-model="user.latitude"
         required
-        :disabled="isSettingCompanyAd"
       />
       <label
         for="newLatitude"
         class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
       >
-        New latitude:
+        Location latitude:
         <span class="text-red-500">*</span>
       </label>
     </div>
 
     <div class="form-group">
       <input
-        type="number"
+        type="number" step="any"
         id="newLongitude"
         class="peer"
         placeholder=" "
         v-model="user.longitude"
         required
-        :disabled="isSettingCompanyAd"
       />
       <label
         for="newLongitude"
         class="peer-focus:text-primaryDark peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-5"
       >
-        New longitude:
+        Location longitude:
         <span class="text-red-500">*</span>
       </label>
     </div>
 
-    <AppButton type="submit" variant="primary" :disabled="isSettingCompanyAd">
-      <span v-if="isSettingCompanyAd">Setting…</span>
-      <span v-else>Set User</span>
+    <AppButton type="submit" variant="primary">
+      Retrieve new ad
     </AppButton>
 
       <div v-if="errors.length > 0" class="text-red-500 px-3 mt-5 rounded-xl-sm">
