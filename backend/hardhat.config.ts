@@ -113,7 +113,8 @@ task('getAd', 'Get an ad to serve')
     const tx = await adManager.getAd(userData);
     await tx.wait();
 
-    console.log(tx);
+    const url = await adManager._getUrl();
+    console.log(url);
   });
 
 // Hardhat Node and sapphire-dev test mnemonic.
