@@ -39,7 +39,7 @@
   export default {
     data() {
         let optionsArr = Object.keys(InterestEmbeddingData).map((key) => {return {'text': key, 'value': InterestEmbeddingData[key]}});
-        console.log(optionsArr)
+        // console.log(optionsArr)
         optionsArr.sort((a, b) => a.text > b.text ? 1 : -1)
         return {
             options: optionsArr,

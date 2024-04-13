@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import {} from '../contracts'
 import { onMounted, ref } from 'vue';
 import { Network, useEthereumStore } from '../stores/ethereum';
 import { abbrAddr } from '@/utils/utils';
@@ -6,6 +7,8 @@ import JazzIcon from '@/components/JazzIcon.vue';
 import AppButton from '@/components/AppButton.vue';
 import InterestPicker from '@/components/InterestPicker.vue'
 import { retry } from '@/utils/promise';
+import { getEmbeddings } from '@/utils/wordEmbeddings'
+import { latitudeLongitudeToCartesian } from '@/utils/geography'
 
 const eth = useEthereumStore();
 const errors = ref<string[]>([]);
@@ -27,11 +30,19 @@ function handleError(error: Error, errorMessage: string) {
 
 const interestPicker = ref(null)
 
+async function publishAdSmartContract(amount, content, salary, age, wordEmbeddingsX, wordEmbeddingsY, locationX, locationY, locationZ) {
+  let now = Date.now()
+  let urlBytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(now.toString()));
+  let url = btoa(String.fromCharCode.apply(null, new Uint8Array(urlBytes)))
+
+  console.log({amount, content, salary, age, wordEmbeddingsX, wordEmbeddingsY, locationX, locationY, locationZ, url})
+}
+
 async function setCompanyAd(e: Event) {
-  if (e.target instanceof HTMLFormElement) {
-    e.target.checkValidity();
-    if (!e.target.reportValidity()) return;
-  }
+  // if (e.target instanceof HTMLFormElement) {
+  //   e.target.checkValidity();
+  //   if (!e.target.reportValidity()) return;
+  // }
 
   e.preventDefault();
 
@@ -53,7 +64,7 @@ async function setCompanyAd(e: Event) {
       }
 
     // Validation
-    if(salary < 0 || age < 0 || latitude < 0 || longitude < 0) {
+    if(salary < 0 || age < 0) {
       // Handle validation error
       return;
     }
@@ -61,28 +72,20 @@ async function setCompanyAd(e: Event) {
     errors.value.splice(0, errors.value.length);
     isSettingCompanyAd.value = true;
 
-    console.log({amount, content, salary, age, latitude, longitude})
+    // console.log({amount, content, salary, age, latitude, longitude})
 
     let selectedItem = interestPicker.value.getSelectedItem()
     if (selectedItem === '') {
       return;
     }
 
-    let embeddingsStr = null;
+    let embeddings = getEmbeddings(selectedItem);
 
-    if(Array.isArray(selectedItem)) {
-      embeddingsStr = selectedItem;
-    } else {
-      embeddingsStr = selectedItem.value;
-    }
+    let cartesian = latitudeLongitudeToCartesian(latitude, longitude)
 
-    let embeddings = embeddingsStr.map(x => parseFloat(x))
-
-    console.log(embeddings)
-
+    await publishAdSmartContract(amount, content, salary, age, embeddings[0], embeddings[1], cartesian[0], cartesian[1], cartesian[2])
 
     // await companyAdBox.setCompanyAd(amount, content, salary, age, latitude, longitude);
-
     // await retry(fetchAndSetCompanyAdValues);
   } catch (e: any) {
     handleError(e, 'Failed to set company ad');

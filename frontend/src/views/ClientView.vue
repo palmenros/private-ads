@@ -4,12 +4,15 @@ import { onMounted, ref } from 'vue';
 import { useMessageBox, useUnwrappedMessageBox } from '../contracts';
 import { Network, useEthereumStore } from '../stores/ethereum';
 import { abbrAddr } from '@/utils/utils';
+import { getEmbeddings } from '@/utils/wordEmbeddings'
 import AppButton from '@/components/AppButton.vue';
 import MessageLoader from '@/components/MessageLoader.vue';
 import JazzIcon from '@/components/JazzIcon.vue';
 import InterestPicker from '@/components/InterestPicker.vue'
 import { retry } from '@/utils/promise';
 import "vue-search-select/dist/VueSearchSelect.css"
+import {latitudeLongitudeToCartesian} from '@/utils/geography'
+
 
 const eth = useEthereumStore();
 const messageBox = useMessageBox();
@@ -63,7 +66,11 @@ const user = ref<User>({
 
 const interestPicker = ref(null)
 
-function setUser(e) {  
+async function retrieveAdSmartContract(salary, age, wordEmbeddingsX, wordEmbeddingsY, locationX, locationY, locationZ) {
+  console.log({salary, age, wordEmbeddingsX, wordEmbeddingsY, locationX, locationY, locationZ})
+}
+
+async function setUser(e) {  
   e.preventDefault()
   if (user.value.salary === undefined ||
       user.value.age === undefined ||
@@ -73,7 +80,7 @@ function setUser(e) {
   }
 
   // Validation
-  if (user.value.salary < 0 || user.value.age < 0 || user.value.latitude < 0 || user.value.longitude < 0) {
+  if (user.value.salary < 0 || user.value.age < 0) {
     // Handle validation error
     return;
   }
@@ -83,25 +90,20 @@ function setUser(e) {
     return;
   }
 
-  let embeddingsStr = null;
-
-  if(Array.isArray(selectedItem)) {
-    embeddingsStr = selectedItem;
-  } else {
-    embeddingsStr = selectedItem.value;
-  }
-
-  let embeddings = embeddingsStr.map(x => parseFloat(x))
-
+  let embeddings = getEmbeddings(selectedItem);
   console.log(embeddings)
 
-  // isSettingUser.value = true;
+  let cartesian = latitudeLongitudeToCartesian(user.value.latitude, user.value.longitude)
+  console.log(cartesian)
 
+  await retrieveAdSmartContract(user.value.salary, user.value.age, embeddings[0], embeddings[1], cartesian[0], cartesian[1], cartesian[2])
+
+  // isSettingUser.value = true;
   // Simulate asynchronous request
-  setTimeout(() => {
-    console.log('User details updated:', user.value);
-    // isSettingUser.value = false;
-  }, 1000);
+  // setTimeout(() => {
+  //   console.log('User details updated:', user.value);
+  //   // isSettingUser.value = false;
+  // }, 1000);
 }
 
 const getCurrentCoordinates = async () => {
