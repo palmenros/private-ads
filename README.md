@@ -1,125 +1,27 @@
-# Oasis Starter dApp
+# PrivAd
 
-This is a skeleton for confidential Oasis dApps:
+Get personalized ads while preserving the privacy of your data.
 
-- `backend` contains the example MessageBox solidity contract, deployment and
-  testing utils.
-- `frontend` contains a Vue-based web application communicating with the
-  backend smart contract.
+## Table of Contents
+- [About](#about)
+- [Testing](#testing)
 
-This monorepo is set up for `pnpm`. Install dependencies by running:
+## About
 
-```sh
-pnpm install
+This project aims to develop a decentralized application (DApp) that leverages machine learning algorithms to serve targeted advertisements while prioritizing user privacy. Traditional advertising methods often compromise user data privacy, leading to concerns about data exploitation and unauthorized access. By utilizing blockchain technology and machine learning techniques, PrivAd seeks to address these concerns by ensuring that user data remains encrypted and anonymous throughout the ad-serving process.
+
+PrivAd will employ a combination of smart contracts, decentralized storage solutions, and machine learning models to analyze user behavior and preferences without directly accessing sensitive personal information.
+
+Key features of PrivAd include:
+- Privacy-preserving local ML: Open source machine learning algorithms are runned locally to analyze user data without disclosing sensitive data.
+- Transparent ad-serving process: Smart contracts govern the ad-serving process, providing transparency to both advertisers and users.
+- Opt-in participation: Users have control over their data and can choose to opt-in or opt-out of the targeted advertising program at any time.
+
+By combining the power of blockchain and machine learning, PrivAd aims to revolutionize the digital advertising industry by offering a more privacy-focused and user-centric approach to targeted advertising.
+
+## Testing
+
+Find tests under the `backend/test/` directory. To run tests use the following command:
 ```
-
-## Backend
-
-Move to the `backend` folder and build smart contracts:
-
-```sh
-pnpm build
+npx hardhat test
 ```
-
-Next, deploy the contract.
-
-### Basic Local Hardhat Deployment
-
-Start the hardhat node. You can either use the local version or the docker sapphire-localnet.
-
-```sh
-#npx hardhat node (LOCAL)
-docker run -it -p8545:8545 -p8546:8546 ghcr.io/oasisprotocol/sapphire-localnet
-```
-
-Deploy smart contracts to that local network:
-
-```sh
-npx hardhat deploy --network sapphire-localnet
-```
-
-Export the private key so it will be used to deploy the smart contract:
-
-```sh
-export PRIVATE_KEY=0x...
-```
-
-To execute a task from the command line to call the smart contract, define it using a `task` inside `backend/hardhat.config.ts` and pass the contract address when deployed. For example, for `task('message')`:
-```sh
-npx hardhat message --network sapphire-localnet 0xCONTRACT_ADDRESS
-```
-
-The deployed MessageBox address will be reported. Remember it and store it
-inside the `frontend` folder's `.env.development`, for example:
-
-```
-VITE_MESSAGE_BOX_ADDR=0xCONTRACT_ADDRESS
-VITE_NETWORK=0x5afd
-VITE_WEB3_GATEWAY=http://localhost:8545
-```
-
-### Deploying to Sapphire Localnet, Testnet and Mainnet
-
-Prepare your hex-encoded private key and store it as an environment variable:
-
-```shell
-export PRIVATE_KEY=0x...
-```
-
-To deploy the contracts to the [Sapphire Localnet], Testnet or Mainnet, use the
-following commands respectively:
-
-```shell
-npx hardhat deploy --network sapphire-localnet
-npx hardhat deploy --network sapphire-testnet
-npx hardhat deploy --network sapphire
-```
-
-[Sapphire Localnet]: https://github.com/oasisprotocol/oasis-web3-gateway/pkgs/container/sapphire-dev
-
-## Frontend
-
-After you compiled the backend, updated `.env.development` with the
-corresponding address and a chain ID, move to the `frontend` folder, compile
-and Hot-Reload frontend for Development:
-
-```sh
-pnpm dev
-```
-
-Navigate to http://localhost:5173 with your browser to view your dApp. Some
-browsers (e.g. Brave) may require https connection and a CA-signed certificate
-to access the wallet. In this case, read the section below on how to properly
-deploy your dApp.
-
-You can use one of the deployed test accounts and associated private key with
-MetaMask. If you use the same MetaMask accounts on fresh local networks such as
-Hardhat Node, Foundry Anvil or sapphire-dev docker image, don't forget to
-*clear your account's activity* each time or manually specify the correct
-account nonce.
-
-### Frontend Deployment
-
-You can build assets for deployment by running:
-
-```sh
-pnpm build
-```
-
-`dist` folder will contain the generated HTML files that can be hosted.
-
-#### Different Website Base
-
-If you are running dApp on a non-root base dir, add
-
-```
-BASE_DIR=/my/public/path
-```
-
-to `.env.production` and bundle the app with
-
-```
-pnpm build-only --base=/my/public/path/
-```
-
-Then copy the `dist` folder to a place of your `/my/public/path` location.
