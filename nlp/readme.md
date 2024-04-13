@@ -1,0 +1,1 @@
+To download the word2vec model go to https://www.kaggle.com/datasets/leadbest/googlenewsvectorsnegative300. 
