@@ -36,11 +36,8 @@ describe("AdManager", function () {
     const id = await adManager._getNextAdId();
     await adManager.postAd(adData, amountToShow, { value: price });
 
-    // Register a user
-    const userData = {age: BigInt(42), salary: BigInt(4200), isActive: true};
-    await adManager.registerUser(userData);
-
     // Check if the ad was stored correctly
+    const userData = {age: BigInt(42), salary: BigInt(4200), isActive: true};
     const res = await adManager._inference(adData, userData);
     expect(res).to.equal(BigInt(0));
   });
@@ -55,11 +52,8 @@ describe("AdManager", function () {
     const id = await adManager._getNextAdId();
     await adManager.postAd(adData, amountToShow, { value: price });
 
-    // Register a user
-    const userData = {age: BigInt(42), salary: BigInt(4200), isActive: true};
-    await adManager.registerUser(userData);
-
     // Check if the ad was stored correctly
+    const userData = {age: BigInt(42), salary: BigInt(4200), isActive: true};
     const res = await adManager._inference(adData, userData);
     expect(res).to.equal(BigInt(13200));
   });

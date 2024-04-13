@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "hardhat/console.sol";
-
 contract AdManager {
 
   uint constant AD_PRICE = 1;
@@ -32,7 +30,26 @@ contract AdManager {
   uint private nextAdId = 0;
   mapping (uint => Ad) private ads;
   uint[] private activeAds;     // ids of active ads
-  mapping (address => UserData) private users;
+
+  constructor() {
+    AdData memory adData = AdData({age: 42, salary: 4200, url: "https://example.com"});
+
+    //require(msg.value == 100 * AD_PRICE * 1000, "Wrong msg.value.");
+
+    for (uint i = 0; i < 100; i++) {
+
+      // Store ad
+      ads[nextAdId] = Ad(
+        adData,
+        100,
+        0);
+
+      activeAds.push(nextAdId);
+
+      nextAdId++;
+      
+    }
+  }
 
   /****** VIEW FUNCTIONS ******/
   function _getNextAdId() public view returns (uint) {
@@ -41,10 +58,6 @@ contract AdManager {
 
   function _getAd(uint id) public view returns (Ad memory) {
     return ads[id];
-  }
-
-  function _getUser(address addr) public view returns (UserData memory) {
-    return users[addr];
   }
 
   /**
@@ -74,23 +87,11 @@ contract AdManager {
   }
 
   /**
-   * Register a new user.
-   * @param userData user data to register.
-   */
-  function register(UserData calldata userData) public {
-    console.log("Registering user...");
-    require(!users[msg.sender].isActive, "You are already registered.");
-    users[msg.sender] = userData;
-    users[msg.sender].isActive = true;
-    console.log("User registered!");
-  }
-
-  /**
    * Post an ad to serve
    * @param adData data of the da to post
    * @param amountToShow number of ads to serve
    */
-  function postAd(AdData calldata adData, uint amountToShow) external payable {
+  function postAd(AdData memory adData, uint amountToShow) public payable {
 
     // Check that the amount payed to post the ad is correct
     require(msg.value == getPrice(amountToShow), "Wrong msg.value.");
@@ -112,18 +113,15 @@ contract AdManager {
    * Serve the best ad to the user, the user gets the money in return.
    * The ad counter is decremented and if it reaches zero it is removed from active ads.
    */
-  function getAd() external returns (string memory) {
-    require(users[msg.sender].isActive, "Inactive user.");
+  function getAd(UserData calldata userData) external returns (string memory) {
     require(!_isFraud(msg.sender), "Unauthorized user.");
-
-    console.log("Hello");
 
     // Find best ad
     uint min = type(uint).max;
     uint bestAdId = 0;
     for (uint i = 0; i < activeAds.length; i++) {
 
-      uint res = _inference(ads[activeAds[i]].data, users[msg.sender]);
+      uint res = _inference(ads[activeAds[i]].data, userData);
       if (min > res) {
         min = res;
         bestAdId = activeAds[i];
