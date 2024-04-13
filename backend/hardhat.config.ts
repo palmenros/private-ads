@@ -52,6 +52,55 @@ task('deploy')
     return adManager;
 });
 
+// Define the task to post an ad
+task('postAd', 'Post an ad to serve')
+  .addParam('age', 'Age parameter')
+  .addParam('salary', 'Salary parameter')
+  .addParam('url', 'Url parameter')
+  .addParam('amountToShow', 'Number of ads to serve')
+  .addPositionalParam('address', 'contract address')
+  .setAction(async (args, hre) => {
+    //const [signer]: SignerWithAddress[] = await hre.ethers.getSigners();
+    const adManager = await hre.ethers.getContractAt('AdManager', args.address);
+    const price = await adManager.getPrice(args.amountToShow);
+
+    // Call the postAd function
+    const tx = await adManager.postAd({age: args.age, salary: args.salary, url: args.url}, args.amountToShow, { value: price });
+    await tx.wait();
+
+    console.log("Ad posted successfully.");
+  });
+
+// Define the task to post an ad
+task('register', 'Get an ad to serve')
+  .addParam('age', 'User age')
+  .addParam('salary', 'User salary')
+  .addPositionalParam('address', 'contract address')
+  .setAction(async (args, hre) => {
+    //const [signer]: SignerWithAddress[] = await hre.ethers.getSigners();
+    const adManager = await hre.ethers.getContractAt('AdManager', args.address);
+
+    // Call the postAd function
+    const url = await adManager.register({age: args.age, salary: args.salary, isActive: true});
+    //await ad.wait();
+
+    //console.log(url);
+  });
+
+// Define the task to post an ad
+task('getAd', 'Get an ad to serve')
+  .addPositionalParam('address', 'contract address')
+  .setAction(async (args, hre) => {
+    //const [signer]: SignerWithAddress[] = await hre.ethers.getSigners();
+    const adManager = await hre.ethers.getContractAt('AdManager', args.address);
+
+    // Call the postAd function
+    const url = await adManager.getAd();
+    //await ad.wait();
+
+    //console.log(url);
+  });
+
 // Hardhat Node and sapphire-dev test mnemonic.
 const TEST_HDWALLET = {
   mnemonic: "test test test test test test test test test test test junk",
