@@ -44,6 +44,8 @@ contract AdManager {
   mapping (uint => Ad) private ads;
   uint[] private activeAds;     // ids of active ads
 
+  mapping (address => string) lastAdUrl; // url of the last ad served to a user
+
   /*
   constructor() {
     AdData memory adData = AdData({age: 42, salary: 4200, url: "https://example.com"});
@@ -73,6 +75,10 @@ contract AdManager {
 
   function _getAd(uint id) public view returns (Ad memory) {
     return ads[id];
+  }
+
+  function _getUrl() public view returns (string memory) {
+    return lastAdUrl[msg.sender];
   }
 
   /**
@@ -137,7 +143,7 @@ contract AdManager {
    * Serve the best ad to the user, the user gets the money in return.
    * The ad counter is decremented and if it reaches zero it is removed from active ads.
    */
-  function getAd(UserData calldata userData) external returns (string memory) {
+  function getAd(UserData calldata userData) external {
     require(!_isFraud(msg.sender), "Unauthorized user.");
 
     // Find best ad
@@ -178,7 +184,7 @@ contract AdManager {
     (bool success, ) = msg.sender.call{value: AD_PRICE}("");
     require(success);
 
-    return ads[bestAdId].data.url;
+    lastAdUrl[msg.sender] = ads[bestAdId].data.url;
 
   }
 
