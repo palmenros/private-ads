@@ -119,6 +119,9 @@ contract AdManager {
     // Find best ad
     uint min = type(uint).max;
     uint bestAdId = 0;
+
+    require(activeAds.length > 0, "There are no Ads to show.");
+
     for (uint i = 0; i < activeAds.length; i++) {
 
       uint res = _inference(ads[activeAds[i]].data, userData);
