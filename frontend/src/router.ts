@@ -12,7 +12,7 @@ const router = createRouter({
       component: ClientView,
     },
     {
-      path: `/Company`,
+      path: `/company`,
       component: BusinessView,
     },
     {

@@ -124,10 +124,8 @@ export const useEthereumStore = defineStore('ethereum', () => {
   const connect = async () => {
     const eth = await getEthereumProvider();
 
-    eth.enable()
-
     const accounts: string[] = (await (eth.request?.({
-      method: 'eth_accounts',
+      method: 'eth_requestAccounts',
     }) || Promise.resolve([]))) as string[];
 
     if (!accounts || accounts?.length <= 0) {

@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { Network, useEthereumStore } from '../stores/ethereum';
+import { abbrAddr } from '@/utils/utils';
+import JazzIcon from '@/components/JazzIcon.vue';
 import AppButton from '@/components/AppButton.vue';
+import InterestPicker from '@/components/InterestPicker.vue'
 import { retry } from '@/utils/promise';
 
 const eth = useEthereumStore();
@@ -106,7 +109,6 @@ onMounted(async () => {
 });
 </script>
 
-
 <template>
   <section class="pt-5" v-if="isCorrectNetworkSelected">
     
@@ -156,7 +158,11 @@ onMounted(async () => {
         </label>
       </div>
 
-      <p class="text-base text-white mb-10">Target viewer information.</p>
+      <p class="text-base text-white mb-10">Target viewer information: </p>
+
+      <span class="text-base text-white mb-10">Target main interest: <span class="text-red-500" data-v-b83013f4="">*</span></span>
+
+      <InterestPicker ref="interestPicker"></InterestPicker>
 
       <div class="form-group">
         <input
