@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {} from '../contracts'
 import { onMounted, ref } from 'vue';
+import { useAdManager, useUnwrappedAdManager } from '../contracts';
 import { Network, useEthereumStore } from '../stores/ethereum';
 import { abbrAddr } from '@/utils/utils';
 import JazzIcon from '@/components/JazzIcon.vue';
@@ -9,8 +10,12 @@ import InterestPicker from '@/components/InterestPicker.vue'
 import { retry } from '@/utils/promise';
 import { getEmbeddings } from '@/utils/wordEmbeddings'
 import { latitudeLongitudeToCartesian } from '@/utils/geography'
+import {uploadAd, downloadAd} from '@/utils/ad_content_server'
 
 const eth = useEthereumStore();
+const adManager = useAdManager()
+const uwAdManager = useUnwrappedAdManager()
+
 const errors = ref<string[]>([]);
 
 const newAmount = ref(null);
@@ -35,7 +40,25 @@ async function publishAdSmartContract(amount, content, salary, age, wordEmbeddin
   let urlBytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(now.toString()));
   let url = btoa(String.fromCharCode.apply(null, new Uint8Array(urlBytes)))
 
-  console.log({amount, content, salary, age, wordEmbeddingsX, wordEmbeddingsY, locationX, locationY, locationZ, url})
+  const adData = {
+      age: BigInt(age), 
+      salary: BigInt(salary), 
+      xWordEmbedding: wordEmbeddingsX,
+      yWordEmbedding: wordEmbeddingsY,
+      xLocation: locationX,
+      yLocation: locationY,
+      zLocation: locationZ,
+      url: url
+    };
+
+  console.log({amount, adData})
+
+  uploadAd(url, content)
+
+  const price = await adManager.value!.getPrice(amount);
+  console.log('Ad price: ', price)
+  await adManager.value!.postAd(adData, amount, { value: price })
+  console.log('Ad posted!')
 }
 
 async function setCompanyAd(e: Event) {

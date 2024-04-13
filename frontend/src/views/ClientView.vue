@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 
-import { useMessageBox, useUnwrappedMessageBox } from '../contracts';
+import { useAdManager, useUnwrappedAdManager } from '../contracts';
 import { Network, useEthereumStore } from '../stores/ethereum';
 import { abbrAddr } from '@/utils/utils';
 import { getEmbeddings } from '@/utils/wordEmbeddings'
@@ -12,11 +12,12 @@ import InterestPicker from '@/components/InterestPicker.vue'
 import { retry } from '@/utils/promise';
 import "vue-search-select/dist/VueSearchSelect.css"
 import {latitudeLongitudeToCartesian} from '@/utils/geography'
+import {uploadAd, downloadAd} from '@/utils/ad_content_server'
 
 
 const eth = useEthereumStore();
-const messageBox = useMessageBox();
-const uwMessageBox = useUnwrappedMessageBox();
+const adManager = useAdManager()
+const uwAdManager = useUnwrappedAdManager()
 
 const errors = ref<string[]>([]);
 const message = ref('');
@@ -67,7 +68,30 @@ const user = ref<User>({
 const interestPicker = ref(null)
 
 async function retrieveAdSmartContract(salary, age, wordEmbeddingsX, wordEmbeddingsY, locationX, locationY, locationZ) {
-  console.log({salary, age, wordEmbeddingsX, wordEmbeddingsY, locationX, locationY, locationZ})
+  const userData = {
+      age: BigInt(age), 
+      salary: BigInt(salary), 
+      xWordEmbedding: wordEmbeddingsX,
+      yWordEmbedding: wordEmbeddingsY,
+      xLocation: locationX,
+      yLocation: locationY,
+      zLocation: locationZ,
+      isActive: true
+  };
+
+  console.log(userData)
+
+
+  // Call the postAd function
+  const tx = await adManager.value!.getAd(userData);
+  await tx.wait();
+
+  console.log(tx)
+
+  const url = await adManager.value!._getUrl()
+
+  console.log(url);
+  return downloadAd(url)
 }
 
 async function setUser(e) {  
@@ -96,7 +120,10 @@ async function setUser(e) {
   let cartesian = latitudeLongitudeToCartesian(user.value.latitude, user.value.longitude)
   console.log(cartesian)
 
-  await retrieveAdSmartContract(user.value.salary, user.value.age, embeddings[0], embeddings[1], cartesian[0], cartesian[1], cartesian[2])
+  isLoading.value = true
+  const adString = await retrieveAdSmartContract(user.value.salary, user.value.age, embeddings[0], embeddings[1], cartesian[0], cartesian[1], cartesian[2])
+  message.value = adString
+  isLoading.value = false
 
   // isSettingUser.value = true;
   // Simulate asynchronous request

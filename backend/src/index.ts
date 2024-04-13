@@ -1,3 +1,3 @@
 export {
-    MessageBox, MessageBox__factory,
+    AdManager, AdManager__factory,
 } from "../typechain-types"

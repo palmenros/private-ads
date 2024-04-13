@@ -44,7 +44,7 @@ contract AdManager {
   mapping (uint => Ad) private ads;
   uint[] private activeAds;     // ids of active ads
 
-  mapping (address => string) lastAdUrl; // url of the last ad served to a user
+  mapping (address => string) private lastAdUrl; // url of the last ad served to a user
 
   /*
   constructor() {
