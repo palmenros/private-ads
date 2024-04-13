@@ -58,6 +58,11 @@ task('postAd', 'Post an ad to serve')
   .addParam('salary', 'Salary parameter')
   .addParam('url', 'Url parameter')
   .addParam('amountToShow', 'Number of ads to serve')
+  .addPositionalParam('xWordEmbedding', 'X word embedding parameter')
+  .addPositionalParam('yWordEmbedding', 'Y word embedding parameter')
+  .addPositionalParam('xLocation', 'X location parameter')
+  .addPositionalParam('yLocation', 'Y location parameter')
+  .addPositionalParam('zLocation', 'Z location parameter')
   .addPositionalParam('address', 'contract address')
   .setAction(async (args, hre) => {
     //const [signer]: SignerWithAddress[] = await hre.ethers.getSigners();
@@ -65,40 +70,50 @@ task('postAd', 'Post an ad to serve')
     const price = await adManager.getPrice(args.amountToShow);
 
     // Call the postAd function
-    const tx = await adManager.postAd({age: args.age, salary: args.salary, url: args.url}, args.amountToShow, { value: price });
+    const adData = {
+      age: args.age,
+      salary: args.salary,
+      xWordEmbedding: args.xWordEmbedding,
+      yWordEmbedding: args.yWordEmbedding,
+      xLocation: args.xLocation,
+      yLocation: args.yLocation,
+      zLocation: args.xLocation,
+      url: args.url
+    };
+    const tx = await adManager.postAd(adData, args.amountToShow, { value: price });
     await tx.wait();
 
     console.log("Ad posted successfully.");
   });
 
 // Define the task to post an ad
-task('register', 'Get an ad to serve')
-  .addParam('age', 'User age')
-  .addParam('salary', 'User salary')
-  .addPositionalParam('address', 'contract address')
-  .setAction(async (args, hre) => {
-    //const [signer]: SignerWithAddress[] = await hre.ethers.getSigners();
-    const adManager = await hre.ethers.getContractAt('AdManager', args.address);
-
-    // Call the postAd function
-    const url = await adManager.register({age: args.age, salary: args.salary, isActive: true});
-    //await ad.wait();
-
-    //console.log(url);
-  });
-
-// Define the task to post an ad
 task('getAd', 'Get an ad to serve')
+  .addParam('age', 'Age parameter')
+  .addParam('salary', 'Salary parameter')
+  .addPositionalParam('xWordEmbedding', 'X word embedding parameter')
+  .addPositionalParam('yWordEmbedding', 'Y word embedding parameter')
+  .addPositionalParam('xLocation', 'X location parameter')
+  .addPositionalParam('yLocation', 'Y location parameter')
+  .addPositionalParam('zLocation', 'Z location parameter')
   .addPositionalParam('address', 'contract address')
   .setAction(async (args, hre) => {
-    //const [signer]: SignerWithAddress[] = await hre.ethers.getSigners();
     const adManager = await hre.ethers.getContractAt('AdManager', args.address);
+    const userData = {
+      age: args.age, 
+      salary: args.salary, 
+      xWordEmbedding: args.xWordEmbedding,
+      yWordEmbedding: args.yWordEmbedding,
+      xLocation: args.xLocation,
+      yLocation: args.yLocation,
+      zLocation: args.xLocation,
+      isActive: true
+    };
 
     // Call the postAd function
-    const url = await adManager.getAd();
-    //await ad.wait();
+    const tx = await adManager.getAd(userData);
+    await tx.wait();
 
-    //console.log(url);
+    console.log(tx);
   });
 
 // Hardhat Node and sapphire-dev test mnemonic.
