@@ -2,12 +2,13 @@
 
 # PrivAds
 
-Get personalized ads while preserving the privacy of your data.
+Privacy preserving targeted advertisement through Machine Learning prediction in Oasis confidential blockchain.
 
 ## Table of Contents
 
 - [About](#about)
-- [Testing](#testing)
+- [Repository structure](#repository-structure)
+- [Running, testing and deploying](#running-testing-and-deploying)
 
 ## About
 
