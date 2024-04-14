@@ -11,7 +11,7 @@ Get personalized ads while preserving the privacy of your data.
 
 ## About
 
-This project aims to develop a decentralized application (DApp) that leverages machine learning algorithms to serve targeted advertisements while prioritizing user privacy. Traditional advertising methods often compromise user data privacy, leading to concerns about data exploitation and unauthorized access. By utilizing Oasis confidential blockchain technology and machine learning techniques, PrivAd seeks to address these concerns by ensuring that user data remains encrypted and anonymous throughout the ad-serving process.
+PrivAds aims to develop a decentralized application (DApp) that leverages Oasis confidential blockchain and machine learning algorithms to serve targeted advertisements while prioritizing user privacy. Traditional advertising methods often compromise user data privacy, leading to concerns about data leaks and unauthorized access and selling of data. PrivAd seeks to address these concerns by ensuring that user data remains encrypted and anonymous throughout the ad-serving process. The advertisers in no moment have access to the user's private data, which is only used inside the confidential smart contract to serve personalized ads.
 
 PrivAd employs a combination of smart contracts, decentralized storage solutions, and machine learning models to analyze user behavior and preferences without giving advertisers access to user's sensitive personal information.
 
@@ -28,9 +28,72 @@ Key features of PrivAd include:
 
 By combining the power of confidential blockchain and machine learning, PrivAd aims to revolutionize the digital advertising industry by offering a more privacy-focused and user-centric approach to targeted advertising.
 
-## Testing
+## Running, testing and deploying
+
+- `backend` contains the example `AdManager` solidity contract, deployment and
+  testing utils and CLI commands to interact with the smart contract.
+- `frontend` contains a Vue-based web application communicating with the
+  backend smart contract.
+
+First, install dependencies using `pnpm`:
+
+```sh
+pnpm install
+```
+
+### Backend
+
+Move to the `backend` folder and build smart contracts:
+
+```sh
+pnpm build
+```
+
+Start a Sapphire localnet by using Docker:
+
+```sh
+docker run -it -p8545:8545 -p8546:8546 ghcr.io/oasisprotocol/sapphire-localnet
+```
+
+Export the private key of a localnet account to deploy the smart contract:
+
+```sh
+export PRIVATE_KEY=0x...
+```
+
+Deploy the smart contract to that local network:
+```sh
+npx hardhat deploy --network sapphire-localnet
+```
+
+The deployed AdManager contract address will be reported. Remember it and store it
+inside the `frontend` folder's `.env.development`, for example:
+
+```
+VITE_MESSAGE_BOX_ADDR=0xCONTRACT_ADDRESS
+VITE_NETWORK=0x5afd
+VITE_WEB3_GATEWAY=http://localhost:8545
+```
+
+To execute a task from the command line to call the smart contract, explore `backend/hardhat.config.ts` for available `task`s and pass the contract address when deployed. For example, for running `task('example')`:
+```sh
+npx hardhat example --network sapphire-localnet 0xCONTRACT_ADDRESS
+```
 
 Find tests under the `backend/test/` directory. To run tests use the following command:
 ```
 npx hardhat test
 ```
+
+### Frontend
+
+After you compiled the backend, updated `.env.development` with the
+corresponding address and a chain ID, move to the `frontend` folder, compile
+and Hot-Reload frontend for Development:
+
+```sh
+pnpm dev
+```
+
+You can use one of the deployed test accounts and associated private key with
+MetaMask.
