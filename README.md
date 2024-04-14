@@ -87,6 +87,12 @@ npx hardhat test
 
 ### Frontend
 
+First, run the flask static content ad server that returns the ad content for a given ad URL, by moving into `ad_server` and executing:
+
+```sh
+flask --app server.py run
+```
+
 After you compiled the backend, updated `.env.development` with the
 corresponding address and a chain ID, move to the `frontend` folder, compile
 and Hot-Reload frontend for Development:
