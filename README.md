@@ -28,12 +28,16 @@ Key features of PrivAd include:
 
 By combining the power of confidential blockchain and machine learning, PrivAd aims to revolutionize the digital advertising industry by offering a more privacy-focused and user-centric approach to targeted advertising.
 
-## Running, testing and deploying
+## Repository structure
 
 - `backend` contains the example `AdManager` solidity contract, deployment and
   testing utils and CLI commands to interact with the smart contract.
 - `frontend` contains a Vue-based web application communicating with the
   backend smart contract.
+- `ad_server` contains the code for a Flask application that is used in the prototype to serve static ad content with a given ad URL. In the future, this will be stored in IPFS storage.
+- `nlp` contains the Python jupyter notebook code used for the Machine Learning word embedding dimensionality reduction.
+
+## Running, testing and deploying
 
 First, install dependencies using `pnpm`:
 
