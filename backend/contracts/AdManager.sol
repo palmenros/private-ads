@@ -8,7 +8,7 @@ contract AdManager {
 
   uint constant SALARY_WEIGHT = 1;
   uint constant AGE_WEIGHT = 1000;
-  /* TODO: PUT WEIGHTS */
+  /* TODO: BETTER WEIGHTS */
   uint constant WORD_EMBEDDING_WEIGHT = 1;
   uint constant LOCATION_WEIGHT = 1;
 
@@ -99,8 +99,14 @@ contract AdManager {
    */
   function _abs(int x) private pure returns (uint) {
     return x >= 0 ? uint(x) : uint(-x);
-}
+  }
 
+  /**
+   * Return the distance between the given Ad and the given Data. Used for KNN ad-user matching.
+   * All computations are done on integers (pre-scaled off-chain and converted from floating point).
+   * @param adData data of the ad 
+   * @param userData data of the user
+   */
   function _inference(AdData memory adData, UserData memory userData) pure public returns (uint) {
     uint deltaAge = _abs(int(adData.age) - int(userData.age)) * AGE_WEIGHT;
     uint deltaSalary = _abs(int(adData.salary) - int(userData.salary)) * SALARY_WEIGHT;
@@ -118,7 +124,7 @@ contract AdManager {
 
   /**
    * Post an ad to serve
-   * @param adData data of the da to post
+   * @param adData data of the ad to post
    * @param amountToShow number of ads to serve
    */
   function postAd(AdData memory adData, uint amountToShow) public payable {
