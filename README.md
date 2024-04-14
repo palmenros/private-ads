@@ -1,3 +1,5 @@
+![Header](./Banner.png)
+
 # PrivAd
 
 Get personalized ads while preserving the privacy of your data.
@@ -8,11 +10,12 @@ Get personalized ads while preserving the privacy of your data.
 
 ## About
 
-This project aims to develop a decentralized application (DApp) that leverages machine learning algorithms to serve targeted advertisements while prioritizing user privacy. Traditional advertising methods often compromise user data privacy, leading to concerns about data exploitation and unauthorized access. By utilizing blockchain technology and machine learning techniques, PrivAd seeks to address these concerns by ensuring that user data remains encrypted and anonymous throughout the ad-serving process.
+This project aims to develop a decentralized application (DApp) that leverages machine learning algorithms to serve targeted advertisements while prioritizing user privacy. Traditional advertising methods often compromise user data privacy, leading to concerns about data exploitation and unauthorized access. By utilizing Oasis confidential blockchain technology and machine learning techniques, PrivAd seeks to address these concerns by ensuring that user data remains encrypted and anonymous throughout the ad-serving process.
 
-PrivAd will employ a combination of smart contracts, decentralized storage solutions, and machine learning models to analyze user behavior and preferences without directly accessing sensitive personal information.
+PrivAd employs a combination of smart contracts, decentralized storage solutions, and machine learning models to analyze user behavior and preferences without giving advertisers access to user's sensitive personal information.
 
 Key features of PrivAd include:
+- 
 - Privacy-preserving local ML: Open source machine learning algorithms are runned locally to analyze user data without disclosing sensitive data.
 - Transparent ad-serving process: Smart contracts govern the ad-serving process, providing transparency to both advertisers and users.
 - Opt-in participation: Users have control over their data and can choose to opt-in or opt-out of the targeted advertising program at any time.
