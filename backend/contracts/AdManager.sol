@@ -46,28 +46,6 @@ contract AdManager {
 
   mapping (address => string) private lastAdUrl; // url of the last ad served to a user
 
-  /*
-  constructor() {
-    AdData memory adData = AdData({age: 42, salary: 4200, url: "https://example.com"});
-
-    //require(msg.value == 100 * AD_PRICE * 1000, "Wrong msg.value.");
-
-    for (uint i = 0; i < 100; i++) {
-
-      // Store ad
-      ads[nextAdId] = Ad(
-        adData,
-        100,
-        0);
-
-      activeAds.push(nextAdId);
-
-      nextAdId++;
-      
-    }
-  }
-  */
-
   /****** VIEW FUNCTIONS ******/
   function _getNextAdId() public view returns (uint) {
     return nextAdId;
@@ -108,18 +86,24 @@ contract AdManager {
    * @param userData data of the user
    */
   function _inference(AdData memory adData, UserData memory userData) pure public returns (uint) {
+
     uint deltaAge = _abs(int(adData.age) - int(userData.age)) * AGE_WEIGHT;
+
     uint deltaSalary = _abs(int(adData.salary) - int(userData.salary)) * SALARY_WEIGHT;
+
     uint deltaWordEmbedding = (
       uint((adData.xWordEmbedding - userData.xWordEmbedding) ** 2) + 
       uint((adData.yWordEmbedding - userData.yWordEmbedding) ** 2)
       ) * WORD_EMBEDDING_WEIGHT;
+
     uint deltaLocation = (
       uint((adData.xLocation - userData.xLocation) ** 2) + 
       uint((adData.yLocation - userData.yLocation) ** 2) +
       uint((adData.zLocation - userData.zLocation) ** 2)
       ) * LOCATION_WEIGHT;
+
     return deltaAge + deltaSalary + deltaWordEmbedding + deltaLocation;
+
   }
 
   /**
@@ -186,18 +170,23 @@ contract AdManager {
 
     }
 
+    // Store the URL of the ad to serve
+    lastAdUrl[msg.sender] = ads[bestAdId].data.url;
+
     // Pay the user
     (bool success, ) = msg.sender.call{value: AD_PRICE}("");
     require(success);
 
-    lastAdUrl[msg.sender] = ads[bestAdId].data.url;
-
   }
 
   function getAdsLeft(uint id) public returns (uint) {
+
     require(ads[id].showedSinceLastFetch >= FETCH_BATCH_SIZE, "Wait for the ad to be served enough times.");
+
     ads[id].showedSinceLastFetch = 0;
+
     return ads[id].adsLeft;
+
   }
 
 }
